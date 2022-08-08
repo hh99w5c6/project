@@ -22,16 +22,17 @@ public class MyPageService {
     private final SubCommentRepository subCommentRepository;
 
     @Transactional(readOnly = true)
-    public List<MyPostDto> readMyPosts(){
+    public List<MyPostDto> readMyPosts() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(username);
         List<Post> posts = postRepository.findAllByMember(member);
         List<MyPostDto> myPosts = new ArrayList<>();
-        for(Post post : posts){
+        for (Post post : posts) {
             myPosts.add(MyPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .author(post.getAuthor())
+                    .imgUrl(post.getImageUrl())
                     .likesCnt(likesRepository.findAllByPost(post).size())
                     .modifiedAt(post.getModifiedAt())
                     .createdAt(post.getCreatedAt())
@@ -41,13 +42,13 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyCommentsDto> readMyComments(){
+    public List<MyCommentsDto> readMyComments() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(username);
         List<Comment> comments = commentRepository.findAllByMember(member);
         List<SubComment> subComments = subCommentRepository.findAllByMember(member);
         List<MyCommentsDto> myComments = new ArrayList<>();
-        for(Comment comment : comments){
+        for (Comment comment : comments) {
             myComments.add(MyCommentsDto.builder()
                     .id(comment.getId())
                     .content(comment.getContent())
@@ -57,7 +58,7 @@ public class MyPageService {
                     .modifiedAt(comment.getModifiedAt())
                     .build());
         }
-        for(SubComment subComment : subComments){
+        for (SubComment subComment : subComments) {
             myComments.add(MyCommentsDto.builder()
                     .id(subComment.getId())
                     .content(subComment.getContent())
@@ -71,20 +72,21 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyPostDto> readMyPostsLikes(){
+    public List<MyPostDto> readMyPostsLikes() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(username);
         List<Likes> likesList = likesRepository.findAllByMemberAndPostIsNotNull(member);
         List<Post> myPostsLikes = new ArrayList<>();
-        for(Likes likes : likesList){
+        for (Likes likes : likesList) {
             myPostsLikes.add(likes.getPost());
         }
         List<MyPostDto> myPostLikesDtos = new ArrayList<>();
-        for(Post post : myPostsLikes){
+        for (Post post : myPostsLikes) {
             myPostLikesDtos.add(MyPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .author(post.getAuthor())
+                    .imgUrl(post.getImageUrl())
                     .likesCnt(likesRepository.findAllByPost(post).size())
                     .modifiedAt(post.getModifiedAt())
                     .createdAt(post.getCreatedAt())
@@ -94,17 +96,17 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyCommentsDto> readMyCommentsLikes(){
+    public List<MyCommentsDto> readMyCommentsLikes() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(username);
         List<Likes> likesList = likesRepository.findAllByMemberAndCommentIsNotNull(member);
         List<Likes> likesList2 = likesRepository.findAllByMemberAndSubCommentIsNotNull(member);
         List<Comment> myCommentsLikes = new ArrayList<>();
-        for(Likes likes : likesList){
+        for (Likes likes : likesList) {
             myCommentsLikes.add(likes.getComment());
         }
         List<MyCommentsDto> myCommentsLikesDtos = new ArrayList<>();
-        for(Comment comment : myCommentsLikes ){
+        for (Comment comment : myCommentsLikes) {
             myCommentsLikesDtos.add(MyCommentsDto.builder()
                     .id(comment.getId())
                     .content(comment.getContent())
@@ -115,10 +117,10 @@ public class MyPageService {
                     .build());
         }
         List<SubComment> mySubCommentLikes = new ArrayList<>();
-        for(Likes likes : likesList2){
+        for (Likes likes : likesList2) {
             mySubCommentLikes.add(likes.getSubComment());
         }
-        for(SubComment subComment : mySubCommentLikes){
+        for (SubComment subComment : mySubCommentLikes) {
             myCommentsLikesDtos.add(MyCommentsDto.builder()
                     .id(subComment.getId())
                     .content(subComment.getContent())

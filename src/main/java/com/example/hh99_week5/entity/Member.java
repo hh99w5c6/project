@@ -22,17 +22,17 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "member")
-    private final List<Post> postList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private final List<Comment> commentList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private final List<SubComment> subCommentList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private final List<Likes> likesList = new ArrayList<>();
+//    @OneToMany(mappedBy = "member")
+//    private final List<Post> postList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private final List<Comment> commentList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private final List<SubComment> subCommentList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private final List<Likes> likesList = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
     private Authority authority;

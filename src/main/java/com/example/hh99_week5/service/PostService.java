@@ -25,6 +25,7 @@ public class PostService {
     private final TodoRepository todoRepository;
     private final LikesRepository likesRepository;
     private final S3Uploader s3Uploader;
+    private final ImgUrlRepository imgUrlRepository;
 
     @Transactional(readOnly = true)
     public List<PostsResponseDto> readPosts() {
@@ -90,17 +91,24 @@ public class PostService {
     public ResponseEntity<String> createPost(PostRequestDto postRequestDto, MultipartFile multipartFile) throws IOException {
         String author = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(author);
+        String[] str = s3Uploader.upload(multipartFile, "static");
 
         Post post = Post.builder()
                 .title(postRequestDto.getTitle())
                 .author(author)
-                .imageUrl(s3Uploader.upload(multipartFile, "static"))
+                .imageUrl(str[1])
                 .todoList(postRequestDto.getTodoList())
                 .member(member)
                 .build();
         postRepository.save(post);
-        createTodo(post);
 
+        imgUrlRepository.save(ImgUrl.builder()
+                .fileName(str[0])
+                .url(str[1])
+                .post(post)
+                .build());
+
+        createTodo(post);
 
         return new ResponseEntity<>("글이 작성되었습니다", HttpStatus.CREATED);
     }

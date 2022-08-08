@@ -4,6 +4,7 @@ import com.example.hh99_week5.dto.PostRequestDto;
 import com.example.hh99_week5.dto.PostResponseDto;
 import com.example.hh99_week5.dto.PostsResponseDto;
 import com.example.hh99_week5.service.PostService;
+import com.example.hh99_week5.service.Scheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class PostController {
     private final PostService postService;
+    private final Scheduler scheduler;
 
     @GetMapping("/posts")
     public List<PostsResponseDto> readPosts(){
@@ -47,5 +49,10 @@ public class PostController {
     @DeleteMapping("/post/{postId}/todo/{todoId}")
     public ResponseEntity<String> deleteTodo(@PathVariable Long postId, @PathVariable Long todoId){
         return postService.deleteTodo(postId, todoId);
+    }
+
+    @PostMapping("/post/test")
+    public void test() {
+        scheduler.deleteImg();
     }
 }

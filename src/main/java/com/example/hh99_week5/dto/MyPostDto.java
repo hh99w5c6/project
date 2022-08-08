@@ -11,6 +11,7 @@ public class MyPostDto {
     private Long id;
     private String title;
     private String author;
+    private String imgUrl;
     private int likesCnt;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

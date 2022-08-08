@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Entity
 public class RefreshToken extends BaseEntity {
 
-
     @Id
     @Column(name = "rt_key")
     private String key;
