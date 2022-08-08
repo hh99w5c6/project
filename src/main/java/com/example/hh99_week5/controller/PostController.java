@@ -50,9 +50,4 @@ public class PostController {
     public ResponseEntity<String> deleteTodo(@PathVariable Long postId, @PathVariable Long todoId){
         return postService.deleteTodo(postId, todoId);
     }
-
-    @PostMapping("/post/test")
-    public void test() {
-        scheduler.deleteImg();
-    }
 }
