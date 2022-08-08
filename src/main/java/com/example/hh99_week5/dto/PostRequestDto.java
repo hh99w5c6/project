@@ -9,5 +9,4 @@ import java.util.List;
 public class PostRequestDto {
     private String title;
     private List<Todo> todoList;
-    private String author;
 }

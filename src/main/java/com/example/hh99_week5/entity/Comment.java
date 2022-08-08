@@ -1,5 +1,6 @@
 package com.example.hh99_week5.entity;
 
+import com.example.hh99_week5.dto.CommentRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,16 +28,23 @@ public class Comment extends BaseEntity{
     @Column(nullable = false)
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     @OneToMany(mappedBy = "comment")
-    private List<CommentToComment> commentToCommentList = new ArrayList<>();
+    private List<SubComment> subCommentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment")
+    private List<Likes> likesList = new ArrayList<>();
+
+    public void updateComment(CommentRequestDto commentRequestDto){
+        this.content = commentRequestDto.getContent();
+    }
 }

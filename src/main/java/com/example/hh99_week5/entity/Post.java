@@ -1,5 +1,6 @@
 package com.example.hh99_week5.entity;
 
+import com.example.hh99_week5.dto.PostRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,14 +28,24 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     String author;
 
+    @Column
+    String imageUrl;
+
     @OneToMany(mappedBy = "post")
     private List<Todo> todoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private List<Comment> commentList = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
+
+    @OneToMany(mappedBy = "post")
+    private List<Likes> likesList = new ArrayList<>();
+
+    public void updatePost(PostRequestDto postRequestDto){
+        this.title = postRequestDto.getTitle();
+    }
 }
