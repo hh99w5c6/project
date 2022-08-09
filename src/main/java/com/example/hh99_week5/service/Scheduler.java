@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -35,8 +34,9 @@ public class Scheduler {
         ObjectListing objects = amazonS3Client.listObjects(bucket, "static");
         do { //1000개 단위로 읽음
             for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-                if(!imgUrlRepository.existsByFileName(objectSummary.getKey())){
-                    amazonS3Client.deleteObject(bucket,objectSummary.getKey());
+                String fileName = objectSummary.getKey();
+                if(!imgUrlRepository.existsByFileName(fileName)){
+                    amazonS3Client.deleteObject(bucket,fileName);
                 }
             }
             objects = amazonS3Client.listNextBatchOfObjects(objects); //<--이녀석은 1000개 단위로만 가져옴..
