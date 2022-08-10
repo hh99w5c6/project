@@ -1,5 +1,6 @@
 package com.example.hh99_week5.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,14 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         // 필요한 권한이 없이 접근하려 할때 403
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().println(
+                new ObjectMapper().writeValueAsString(
+                        ResponseDto.fail("BAD_REQUEST", "로그인이 필요합니다.")
+                )
+        );
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//        response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 }
 

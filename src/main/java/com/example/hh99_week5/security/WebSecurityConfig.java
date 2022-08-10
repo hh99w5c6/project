@@ -50,11 +50,12 @@ public class WebSecurityConfig {
 
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .antMatchers("/api/member/**").permitAll()
-                        .antMatchers("/api/post/**").permitAll()
-                        .antMatchers("/api/comment/**").permitAll()
-                        .antMatchers("/api/likes/**").permitAll()
-                        // 어떤 요청이든 '인증'
+                        .antMatchers("/api/member/**").permitAll() // 로그인,회원가입은 토큰없이도 가능
+                        .antMatchers("/api/posts/**").permitAll() // 전체 게시글 조회하기,선택 게시글 조회하기 로그인 없이도 가능
+//                        .antMatchers("/api/post/**").permitAll() // api/post/** 는 모두 게시글 작성,수정,삭제 이므로 로그인이 필요하다.
+//                        .antMatchers("/api/comment/**").permitAll() // 댓글,대댓글 작성도 로그인이 반드시 필요하다.
+//                        .antMatchers("/api/likes/**").permitAll() // 좋아요는 로그인 필요없음?
+                        // 나머지 어떤 요청이든 '인증' 필요
                         .anyRequest().authenticated());
 
         http.headers()

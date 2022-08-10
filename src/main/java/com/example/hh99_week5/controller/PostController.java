@@ -20,33 +20,33 @@ public class PostController {
     private final PostService postService;
     private final Scheduler scheduler;
 
-    @GetMapping("/posts")
+    @GetMapping("/posts") // 전체 게시글 조회
     public List<PostsResponseDto> readPosts(){
         return postService.readPosts();
     }
 
-    @GetMapping("/post/{postId}")
+    @GetMapping("/posts/{postId}") // 선택 게시글 조회
     public PostResponseDto readPost(@PathVariable Long postId){
         return postService.readPost(postId);
     }
 
-    @PostMapping("/post")
+    @PostMapping("/post") // 게시글 작성
     public ResponseEntity<String> createPost(@RequestPart PostRequestDto postRequestDto,
                                              @RequestPart MultipartFile multipartFile) throws IOException {
         return postService.createPost(postRequestDto, multipartFile);
     }
 
-    @PutMapping("/post/{postId}")
+    @PutMapping("/post/{postId}") // 게시글 수정
     public ResponseEntity<String> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto){
         return postService.updatePost(postId, postRequestDto);
     }
 
-    @DeleteMapping("/post/{postId}")
+    @DeleteMapping("/post/{postId}") // 게시글 삭제
     public ResponseEntity<String> deletePost(@PathVariable Long postId){
         return postService.deletePost(postId);
     }
 
-    @DeleteMapping("/post/{postId}/todo/{todoId}")
+    @DeleteMapping("/post/{postId}/todo/{todoId}") // 선택 게시글의 todo 삭제
     public ResponseEntity<String> deleteTodo(@PathVariable Long postId, @PathVariable Long todoId){
         return postService.deleteTodo(postId, todoId);
     }
