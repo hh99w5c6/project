@@ -25,10 +25,12 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final SubCommentRepository subCommentRepository;
 
-    @Transactional
+    @Transactional // 댓글 작성
     public ResponseEntity<String> createComment(Long postId, CommentRequestDto commentRequestDto) {
         String author = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(author);
         Member member = memberRepository.getMembersByNickname(author);
+        System.out.println(member.getNickname() + member.getAuthority());
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));

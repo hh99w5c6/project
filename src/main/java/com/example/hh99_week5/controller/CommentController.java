@@ -12,37 +12,37 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/post/{postId}/comment")
+    @PostMapping("/post/{postId}/comment") // 댓글 작성
     public ResponseEntity<String> createComment(@PathVariable Long postId,
                                                 @RequestBody CommentRequestDto commentRequestDto){
         return commentService.createComment(postId, commentRequestDto);
     }
 
-    @PostMapping("/comment/{commentId}/comment")
+    @PostMapping("/comment/{commentId}/comment") // 대댓글 작성
     public ResponseEntity<String> createSubComment(@PathVariable Long commentId,
                                                    @RequestBody CommentRequestDto commentRequestDto){
         return commentService.createSubComment(commentId, commentRequestDto);
     }
 
-    @PutMapping("/comment/{commentId}")
+    @PutMapping("/comment/{commentId}") // 댓글 수정
     public ResponseEntity<String> updateComment(@PathVariable Long commentId,
                                                 @RequestBody CommentRequestDto commentRequestDto){
         return commentService.updateComment(commentId, commentRequestDto);
     }
 
-    @PutMapping("/subComment/{subCommentId}")
+    @PutMapping("/subComment/{subCommentId}") // 대댓글 수정
     public ResponseEntity<String> updateSubComment(@PathVariable Long subCommentId,
                                                    @RequestBody CommentRequestDto commentRequestDto){
         return commentService.updateSubComment(subCommentId, commentRequestDto);
     }
 
 
-    @DeleteMapping("/comment/{commentId}")
+    @DeleteMapping("/comment/{commentId}") // 댓글 삭제
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId){
         return commentService.deleteComment(commentId);
     }
 
-    @DeleteMapping("/subComment/{subCommentId}")
+    @DeleteMapping("/subComment/{subCommentId}") // 대댓글 삭제
     public ResponseEntity<String> deleteSubComment(@PathVariable Long subCommentId){
         return commentService.deleteSubComment(subCommentId);
     }

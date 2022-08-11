@@ -16,22 +16,22 @@ import java.util.List;
 public class MyPageController {
     private final MyPageService myPageService;
 
-    @GetMapping("/posts")
+    @GetMapping("/posts") // 내가쓴글 조회하기
     public List<MyPostDto> readMyPosts(){
         return myPageService.readMyPosts();
     }
 
-    @GetMapping("/comments")
+    @GetMapping("/comments") //내가쓴 댓글 조회하기
     public List<MyCommentsDto> readMyComments(){
         return myPageService.readMyComments();
     }
 
-    @GetMapping("/likes/posts")
+    @GetMapping("/likes/posts") //내가 좋아요한 게시글 조회하기
     public List<MyPostDto> readMyPostsLikes(){
         return myPageService.readMyPostsLikes();
     }
 
-    @GetMapping("/likes/comments")
+    @GetMapping("/likes/comments") //내가 좋아요한 댓글 조회하기
     public List<MyCommentsDto> readMyCommentsLikes(){
         return myPageService.readMyCommentsLikes();
     }

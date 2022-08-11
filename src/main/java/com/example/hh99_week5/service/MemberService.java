@@ -29,7 +29,7 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
+    @Transactional // 회원가입
     public ResponseEntity<String> signup(MemberRequestDto memberRequestDto) {
         if (memberRepository.existsByNickname(memberRequestDto.getNickname())) {
             return new ResponseEntity<>("중복된 닉네임입니다.", HttpStatus.BAD_REQUEST);
@@ -49,7 +49,7 @@ public class MemberService {
         return new ResponseEntity<>("회원가입이 완료되었습니다.", HttpStatus.OK);
     }
 
-    @Transactional
+    @Transactional // 로그인
     public ResponseEntity<TokenDto> login(LoginDto loginDto, HttpServletResponse response) {
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
