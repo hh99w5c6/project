@@ -19,7 +19,7 @@ public class LikesService {
     private final SubCommentRepository subCommentRepository;
 
     @Transactional
-    public void likesToPost(Long postId){
+    public void likesToPost(Long postId){ // 게시글에 좋아요
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(username);
         Post post = postRepository.findById(postId)

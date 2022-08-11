@@ -46,7 +46,7 @@ public class PostController {
         return postService.deletePost(postId);
     }
 
-    @DeleteMapping("/post/{postId}/todo/{todoId}") // 선택 게시글의 todo 삭제
+    @DeleteMapping("/post/{postId}/todo/{todoId}") // 선택 게시글의 투두 삭제
     public ResponseEntity<String> deleteTodo(@PathVariable Long postId, @PathVariable Long todoId){
         return postService.deleteTodo(postId, todoId);
     }

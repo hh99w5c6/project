@@ -2,6 +2,8 @@ package com.example.hh99_week5.service;
 
 import com.example.hh99_week5.dto.*;
 import com.example.hh99_week5.entity.*;
+import com.example.hh99_week5.exception.CustomException;
+import com.example.hh99_week5.exception.ErrorCode;
 import com.example.hh99_week5.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class PostService {
     private final ImgUrlRepository imgUrlRepository;
 
     @Transactional(readOnly = true)
-    public List<PostsResponseDto> readPosts() {
+    public List<PostsResponseDto> readPosts() { // 전체 게시글 조회
         List<Post> postList = postRepository.findAll();
         List<PostsResponseDto> postsResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -45,13 +48,16 @@ public class PostService {
         return postsResponseDtoList;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) //선택 게시글 조회
     public PostResponseDto readPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
+        Optional<Post> post = postRepository.findById(postId);
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
+        if (post.isEmpty()) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
-        for (Comment comment : post.getCommentList()) {
+        for (Comment comment : post.get().getCommentList()) {
             List<SubCommentResponseDto> subCommentResponseDtoList = new ArrayList<>();
             for (SubComment subComment : comment.getSubCommentList()) {
                 subCommentResponseDtoList.add(SubCommentResponseDto.builder()
@@ -75,19 +81,19 @@ public class PostService {
         }
 
         return PostResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .author(post.getAuthor())
-                .imgUrl(post.getImageUrl())
-                .likesCnt(likesRepository.findAllByPost(post).size())
-                .todoList(post.getTodoList().stream().map(TodoResponseDto::new).collect(Collectors.toList()))
+                .id(post.get().getId())
+                .title(post.get().getTitle())
+                .author(post.get().getAuthor())
+                .imgUrl(post.get().getImageUrl())
+                .likesCnt(likesRepository.findAllByPost(post.get()).size())
+                .todoList(post.get().getTodoList().stream().map(TodoResponseDto::new).collect(Collectors.toList()))
                 .commentList(commentResponseDtoList)
-                .createdAt(post.getCreatedAt())
-                .modifiedAt(post.getModifiedAt())
+                .createdAt(post.get().getCreatedAt())
+                .modifiedAt(post.get().getModifiedAt())
                 .build();
     }
 
-    @Transactional
+    @Transactional // 게시글 작성
     public ResponseEntity<String> createPost(PostRequestDto postRequestDto, MultipartFile multipartFile) throws IOException {
         String author = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.getMembersByNickname(author);
@@ -124,14 +130,17 @@ public class PostService {
         }
     }
 
-    @Transactional
+    @Transactional // 게시글 수정
     public ResponseEntity<String> updatePost(Long postId, PostRequestDto postRequestDto) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
-        if (!post.getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+        Optional<Post> post = postRepository.findById(postId);
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
+        if (post.isEmpty()) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+        if (!post.get().getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
             return new ResponseEntity<>("작성자만 수정할 수 있습니다", HttpStatus.UNAUTHORIZED);
         }
-        List<Todo> todos = post.getTodoList();
+        List<Todo> todos = post.get().getTodoList();
         for (Todo todo : todos) {
             Long todoId = todo.getId();
             todoRepository.deleteById(todoId);
@@ -140,32 +149,38 @@ public class PostService {
             todoRepository.save(Todo.builder()
                     .content(todo.getContent())
                     .done(todo.isDone())
-                    .post(post)
+                    .post(post.get())
                     .build());
         }
-        post.updatePost(postRequestDto);
+        post.get().updatePost(postRequestDto);
         return new ResponseEntity<>("글이 수정되었습니다", HttpStatus.OK);
     }
 
     @Transactional
     public ResponseEntity<String> deletePost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
-        if (!post.getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+        Optional<Post> post = postRepository.findById(postId);
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
+        if (post.isEmpty()) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+        if (!post.get().getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
             return new ResponseEntity<>("작성자만 삭제할 수 있습니다", HttpStatus.UNAUTHORIZED);
         }
         postRepository.deleteById(postId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("게시글 삭제가 완료되었습니다.",HttpStatus.OK);
     }
 
     @Transactional
     public ResponseEntity<String> deleteTodo(Long postId, Long todoId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 아이디가 존재하지 않습니다"));
-        if (!post.getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+        Optional<Post> post = postRepository.findById(postId);
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다"));
+        if (post.isEmpty()) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+        if (!post.get().getAuthor().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
             return new ResponseEntity<>("작성자만 삭제할 수 있습니다", HttpStatus.UNAUTHORIZED);
         }
         todoRepository.deleteById(todoId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("삭제가 완료되었습니다.",HttpStatus.OK);
     }
 }
